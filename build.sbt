@@ -1,4 +1,4 @@
-name := "epwb"
+name := "genmc"
 
 version := "1.0"
 
