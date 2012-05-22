@@ -5,7 +5,8 @@ trait PathGenerator[Seed, Path] {
 }
 
 trait PathEvaluator[Path, Result] {
-  def apply(p: Path) : Result
+  def apply(p: Path) : Unit
+  def result : Result
 }
 
 class Simulator[
