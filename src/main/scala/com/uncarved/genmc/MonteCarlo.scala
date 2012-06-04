@@ -1,28 +1,20 @@
 package com.uncarved.genmc
 
-trait PathGenerator[Seed, Path] {
-  def apply(s: Seed) : Path
-}
-
-trait PathEvaluator[Path, Result] {
-  def apply(p: Path) : Unit
-  def result : Result
-}
-
 class Simulator[
   Seed, 
   Path,
   Result,
-  PathGen<:PathGenerator[Seed, Path], 
-  Eval<:PathEvaluator[Path, Result]
+  Accumulator
 ](
-  val pgen: PathGen,  //A path generator
-  val eval: Eval)     //A path evaluator
+  val pgen: Seed => Path,                           //A path generator
+  val eval: Path => Result,                         //A path evaluator
+  val reduce: (Accumulator, Result) => Accumulator  //A reduction func
+)
 {
-  def run(seeds: Seq[Seed]) : Eval = {
-    seeds foreach { s: Seed => eval(pgen(s)) }
-
-    eval
-  }
+  def run(seeds: Seq[Seed], initial: Accumulator) : Accumulator = 
+    seeds.foldLeft(initial) { 
+      (a: Accumulator, s: Seed) => 
+        reduce(a, eval(pgen(s)))
+      }
 }
 
