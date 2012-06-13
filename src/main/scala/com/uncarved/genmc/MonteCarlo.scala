@@ -15,13 +15,13 @@ import akka.util.Timeout
   * @param eval Evaluates a single Path
   * @param reduce Accumulates a number of the results of evaluation
   *
-  **/
+  */
 class Simulator[
   Seed,                                             
   Path,
   Result,
   Accumulator
-](
+] private(
   val pgen: Seed => Path,                           //A path generator
   val eval: Path => Result,                         //A path evaluator
   val reduce: (Accumulator, Result) => Accumulator  //A reduction func
@@ -30,7 +30,7 @@ class Simulator[
   /** run a simulation
     * @param seeds inputs to the path generator
     * @param initial the start value for the reduction operation
-    **/
+    */
   def run(seeds: Seq[Seed], initial: Accumulator) : Accumulator = 
     seeds.foldLeft(initial) { 
       (a: Accumulator, s: Seed) => 
@@ -39,6 +39,32 @@ class Simulator[
 }
 
 
+/** The heart of any Monte Carlo framework is of course the Simulator.
+  * Here we split the simulator into three functions.
+  *
+  * @param pgen Generates a Path given some Seed
+  * @param eval Evaluates a single Path
+  * @param reduce Accumulates a number of the results of evaluation
+  *
+  * This companion object is simply there to make it simpler to create
+  * a simulator instance without having to specify a lot of redundant
+  * type information that can already be deduced from the types of the 
+  * three functions.
+  */
+object Simulator {
+  /** Create a simulator given the three functions.
+    *
+    * @param pgen Generates a Path given some Seed
+    * @param eval Evaluates a single Path
+    * @param reduce Accumulates a number of the results of evaluation
+    */
+  def apply[Seed, Path, Result, Accumulator](
+    pgen: Seed => Path,                           //A path generator
+    eval: Path => Result,                         //A path evaluator
+    reduce: (Accumulator, Result) => Accumulator  //A reduction func
+  ) = new Simulator[Seed, Path, Result, Accumulator](pgen, eval, reduce)
+}
+
 /** A parallel Monte Carlo simulator
   *
   * @param nWorkers How many worker threads to run
@@ -46,7 +72,7 @@ class Simulator[
   * @param eval Evaluates a single Path
   * @param reduce Accumulates a number of the results of evaluation
   *
-  **/
+  */
 class ParallelMC[
   Seed,                                             
   Path,
@@ -77,7 +103,7 @@ class ParallelMC[
   /** worker class used to run simulation chunks in parallel */
   class Worker(val initial: Accumulator) extends Actor {
     private[this] val simulator = 
-      new Simulator[Seed, Path, Result, Accumulator](pgen, eval, accumulate)
+      Simulator(pgen, eval, accumulate)
 
     /** message handler for worker class */
     def receive = {
@@ -90,7 +116,7 @@ class ParallelMC[
   /** coordinates workers running simulation chunks, sending pieces to them,
     * receiving results and reducing them. 
     * @param initial The starting state of the accumulator object.
-    **/
+    */
   class Master(initial: Accumulator) extends Actor {
     /** worker pool.  Jobs are given out on a round robin basis */
     private[this] val workerRouter = context.actorOf(
