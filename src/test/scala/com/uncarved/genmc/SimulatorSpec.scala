@@ -35,7 +35,7 @@ class SimulatorSpec extends Specification {
 
   "ParallelMC" should {
     "be able to calculate pi by shooting bullets at a unit quarter circle (in parallel)" in {
-      val sim = new ParallelMC[Int, (Double, Double), Int, Double](
+      val sim = ParallelMC(
         8,
         10000,
         10,
@@ -52,14 +52,14 @@ class SimulatorSpec extends Specification {
   }
 
   "be able to flip coins like a beast" in {
-    val sim = new ParallelMC[Int, Boolean, Int, Int](
+    val sim = ParallelMC(
       8,
       10000,
       10,
       { s: Int => randGen.setSeed(s); randGen.nextBoolean() },
       { p: Boolean => if(p) 1 else 0 },
-      _+_,
-      _+_
+      (a: Int, b: Int) => a+b,
+      (a: Int, b: Int) => a+b
     )
 
     val npaths = 2000000

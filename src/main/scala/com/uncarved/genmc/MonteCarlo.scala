@@ -68,6 +68,8 @@ object Simulator {
 /** A parallel Monte Carlo simulator
   *
   * @param nWorkers How many worker threads to run
+  * @param chunkSize Number of paths to distribute as a single job
+  * @param calcTimeout How long to wait for a result (in seconds)
   * @param pgen Generates a Path given some Seed
   * @param eval Evaluates a single Path
   * @param reduce Accumulates a number of the results of evaluation
@@ -78,7 +80,7 @@ class ParallelMC[
   Path,
   Result,
   Accumulator
-](
+] private (
   val nrOfWorkers: Int,                             //number of worker threads
   val chunkSize:   Int,                             //num of paths in a chunk
   val calcTimeout: Int,                             //A calculation timeout (in secs)
@@ -170,4 +172,38 @@ class ParallelMC[
 
     result
   }
+}
+
+/** Companion object to simplify the creation of parallel Monte Carlo 
+  * simulators given the appropriate parameters.
+  */
+object ParallelMC {
+  /** Creates parallel Monte Carlo simulators given the appropriate parameters.
+    *
+    * @param nWorkers How many worker threads to run
+    * @param chunkSize Number of paths to distribute as a single job
+    * @param calcTimeout How long to wait for a result (in seconds)
+    * @param pgen Generates a Path given some Seed
+    * @param eval Evaluates a single Path
+    * @param reduce Accumulates a number of the results of evaluation
+    *
+    */
+  def apply[Seed, Path, Result, Accumulator](
+      nrOfWorkers: Int,                             //number of worker threads
+      chunkSize:   Int,                             //num of paths in a chunk
+      calcTimeout: Int,                             //A calculation timeout (in secs)
+      pgen: Seed => Path,                           //A path generator
+      eval: Path => Result,                         //A path evaluator
+      accumulate: (Accumulator, Result) => Accumulator,    
+      reduce: (Accumulator, Accumulator)  => Accumulator   
+    ) =
+    new ParallelMC[Seed, Path, Result, Accumulator](
+      nrOfWorkers,
+      chunkSize,
+      calcTimeout,
+      pgen,
+      eval,
+      accumulate,
+      reduce
+    )
 }
