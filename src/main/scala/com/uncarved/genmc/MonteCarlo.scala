@@ -1,5 +1,7 @@
 package com.uncarved.genmc
 
+import scala.language.postfixOps
+
 import akka.actor._
 import scala.concurrent.Await
 import akka.pattern.ask
