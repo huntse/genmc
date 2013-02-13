@@ -1,11 +1,10 @@
 package com.uncarved.genmc
 
 import akka.actor._
-import akka.dispatch.Await
+import scala.concurrent.Await
 import akka.pattern.ask
 import akka.routing.RoundRobinRouter
-import akka.util.duration._
-import akka.util.Duration
+import scala.concurrent.duration._
 import akka.util.Timeout
 
 /** The heart of any Monte Carlo framework is of course the Simulator.

@@ -28,7 +28,7 @@ class SimulatorSpec extends Specification {
       )
       val npaths = 3000000
       
-      val mypi = sim.run(0 until npaths, 0.) / npaths.toDouble * 4.0
+      val mypi = sim.run(0 until npaths, 0.0) / npaths.toDouble * 4.0
       math.abs(math.Pi-mypi) must beLessThan(0.0025)
     }
   }
@@ -46,12 +46,12 @@ class SimulatorSpec extends Specification {
       )
       val npaths = 3000000
       
-      val mypi = sim.run(0 until npaths, 0.) / npaths.toDouble * 4.0
+      val mypi = sim.run(0 until npaths, 0.0) / npaths.toDouble * 4.0
       math.abs(math.Pi-mypi) must beLessThan(0.0025)
     }
   }
 
-  "be able to flip coins like a beast" in {
+  "be able to flip coins like a baws" in {
     val sim = ParallelMC(
       8,
       10000,
