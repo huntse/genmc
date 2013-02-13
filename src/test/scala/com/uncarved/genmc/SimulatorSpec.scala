@@ -28,7 +28,7 @@ class SimulatorSpec extends Specification {
       )
       val npaths = 3000000
       
-      val mypi = sim.run(0 to npaths-1, 0.) / npaths.toDouble * 4.0
+      val mypi = sim.run(0 until npaths, 0.) / npaths.toDouble * 4.0
       math.abs(math.Pi-mypi) must beLessThan(0.0025)
     }
   }
@@ -46,7 +46,7 @@ class SimulatorSpec extends Specification {
       )
       val npaths = 3000000
       
-      val mypi = sim.run(0 to npaths-1, 0.) / npaths.toDouble * 4.0
+      val mypi = sim.run(0 until npaths, 0.) / npaths.toDouble * 4.0
       math.abs(math.Pi-mypi) must beLessThan(0.0025)
     }
   }
@@ -64,7 +64,7 @@ class SimulatorSpec extends Specification {
 
     val npaths = 2000000
     
-    val boutHalf = sim.run(0 to npaths-1, 0) / npaths.toDouble
+    val boutHalf = sim.run(0 until npaths, 0) / npaths.toDouble
     math.abs(boutHalf-0.5) must beLessThan(0.005)
 
   }
