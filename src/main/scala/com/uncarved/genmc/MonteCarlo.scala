@@ -5,7 +5,7 @@ import scala.language.postfixOps
 import akka.actor._
 import scala.concurrent.Await
 import akka.pattern.ask
-import akka.routing.RoundRobinRouter
+import akka.routing.RoundRobinPool
 import scala.concurrent.duration._
 import akka.util.Timeout
 
@@ -124,7 +124,7 @@ class ParallelMC[
     /** worker pool.  Jobs are given out on a round robin basis */
     private[this] val workerRouter = context.actorOf(
       Props(new Worker(initial)).withRouter(
-        RoundRobinRouter(nrOfWorkers)),
+        RoundRobinPool(nrOfWorkers)),
         name = "workerRouter"
       )
 
@@ -169,7 +169,7 @@ class ParallelMC[
     val future = master ? RunSimulation(seeds)
     
     val result = Await.result(future, timeout.duration).asInstanceOf[Accumulator]
-    system.shutdown()
+    system.terminate()
 
     result
   }
